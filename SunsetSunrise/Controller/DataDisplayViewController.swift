@@ -59,9 +59,21 @@ class DataDisplayViewController: UIViewController {
         formatter.dateFormat = "dd.MM.yyyy"
         modelController.locationDate.date = formatter.string(from: datePicker.date)
         dateLabel.text = modelController.locationDate.date
+        fetchDataNewTime()
+        
         picker.removeFromSuperview()
     }
     
+    func fetchDataNewTime() {
+        let fetchSI = FetchSunInfo(url: RequestURL(latitude: Float(modelController.locationDate.coordinates.latitude)! , longitute: Float(modelController.locationDate.coordinates.longitude)! , date: modelController.locationDate.date))
+        fetchSI.fetch(completion: { (resSunInfo) -> () in
+            if let res = resSunInfo {
+                self.modelController.sunInfo = res
+                self.modelController.updateTime()
+                self.setup()
+            }
+        })
+    }
     
     
     // MARK: - Labels setup

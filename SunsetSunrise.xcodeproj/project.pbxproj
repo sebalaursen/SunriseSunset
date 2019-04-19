@@ -97,7 +97,7 @@
 				9E2CA7CC22688FEC00AA2093 /* ModelController */,
 				9E2CA7CB22686FF200AA2093 /* Networking */,
 				9E2CA7B82267554F00AA2093 /* Model */,
-				9E2CA7B92267555D00AA2093 /* Extensions */,
+				9E2CA7B92267555D00AA2093 /* Helpers */,
 				9E2CA7BA2267557700AA2093 /* Controller */,
 				9E2CA7A62267356600AA2093 /* AppDelegate.swift */,
 				9E2CA7AA2267356600AA2093 /* Main.storyboard */,
@@ -117,13 +117,13 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		9E2CA7B92267555D00AA2093 /* Extensions */ = {
+		9E2CA7B92267555D00AA2093 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
 				9E2CA7DE2269935300AA2093 /* ViewControllerExtension.swift */,
 				9E2CA7E02269A86D00AA2093 /* CoreLocationManager.swift */,
 			);
-			path = Extensions;
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		9E2CA7BA2267557700AA2093 /* Controller */ = {

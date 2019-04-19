@@ -72,6 +72,7 @@ class SetupDataViewController: UIViewController {
         if self.locationTextField.text != "" && self.dateTextField.text != "" {
             modelController.getTimeZone()
             let fetchSI = FetchSunInfo(url: RequestURL(latitude: Float(modelController.locationDate.coordinates.latitude)! , longitute: Float(modelController.locationDate.coordinates.longitude)! , date: modelController.locationDate.date))
+            print(modelController.locationDate.date)
             fetchSI.fetch(completion: { (resSunInfo) -> () in
                 if let res = resSunInfo {
                     self.modelController.sunInfo = res
