@@ -142,6 +142,7 @@ class MainViewController: UIViewController {
         formatter.dateFormat = "dd.MM.yyyy"
         print(formatter.string(from: date))
         modelController.locationDate.date = formatter.string(from: date)
+        modelController.getTimeZone()
         
         fetchSunInfo()
     }
