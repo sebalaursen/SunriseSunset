@@ -51,7 +51,7 @@ class ModelController {
             guard let placemark = placemarks?[0], let _ = placemarks?[0].timeZone else {
                 return
             }
-            self.locationDate.timeDifference = placemark.timeZone!.secondsFromGMT() - 3600
+            self.locationDate.timeDifference = placemark.timeZone!.secondsFromGMT()
         }
     }
 }

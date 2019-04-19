@@ -61,7 +61,6 @@ class SetupDataViewController: UIViewController {
         formatter.dateFormat = "dd.MM.yyyy"
         modelController.locationDate.date = formatter.string(from: datePicker.date)
         dateTextField.text = modelController.locationDate.date
-        modelController.getTimeZone()
         view.endEditing(true)
     }
     
@@ -71,7 +70,8 @@ class SetupDataViewController: UIViewController {
     
     @IBAction func doneAction(_ sender: Any) {
         if self.locationTextField.text != "" && self.dateTextField.text != "" {
-            let fetchSI = FetchSunInfo(url: RequestURL(latitude: Float(modelController.locationDate.coordinates.latitude)! , longitute: Float(modelController.locationDate.coordinates.latitude)! , date: modelController.locationDate.date))
+            modelController.getTimeZone()
+            let fetchSI = FetchSunInfo(url: RequestURL(latitude: Float(modelController.locationDate.coordinates.latitude)! , longitute: Float(modelController.locationDate.coordinates.longitude)! , date: modelController.locationDate.date))
             fetchSI.fetch(completion: { (resSunInfo) -> () in
                 if let res = resSunInfo {
                     self.modelController.sunInfo = res

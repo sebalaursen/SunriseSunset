@@ -17,7 +17,7 @@ class FetchSunInfo {
     }
     
     func fetch(completion: @escaping (_ resSunInfo: SunInfo?) -> () ) {
-        //print(requestedURL.url.string)
+        print(requestedURL.url.string)
         guard let url = URL(string: requestedURL.url.string!) else { return  }
         
         URLSession.shared.dataTask(with: url) { (data,_ ,err) in
