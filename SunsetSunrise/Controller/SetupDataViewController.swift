@@ -76,7 +76,6 @@ class SetupDataViewController: UIViewController {
             fetchSI.fetch(completion: { (resSunInfo) -> () in
                 if let res = resSunInfo {
                     self.modelController.sunInfo = res
-                    self.modelController.updateTime()
                     
                     self.performSegue(withIdentifier: "doneSettingSegue", sender: nil)
                 }
@@ -118,8 +117,6 @@ extension SetupDataViewController: GMSAutocompleteViewControllerDelegate {
         modelController.locationDate.adress = place.formattedAddress!
         modelController.locationDate.coordinates.latitude = "\(place.coordinate.latitude)"
         modelController.locationDate.coordinates.longitude = "\(place.coordinate.longitude)"
-        print(modelController.locationDate.coordinates.latitude)
-        print(modelController.locationDate.coordinates.longitude)
         dismiss(animated: true, completion: nil)
     }
 

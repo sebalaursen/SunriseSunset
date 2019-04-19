@@ -27,6 +27,7 @@ class DataDisplayViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupDatePicker()
+        modelController.updateTime()
     }
     
     override func viewWillAppear(_ animated: Bool) {

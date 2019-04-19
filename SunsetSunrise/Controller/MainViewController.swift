@@ -151,7 +151,6 @@ class MainViewController: UIViewController {
         fetchSI.fetch(completion: { (resSunInfo) -> () in
             if let res = resSunInfo {
                 self.modelController.sunInfo = res
-                self.modelController.updateTime()
                 self.locManager.stopTracking()
                 
                 self.performSegue(withIdentifier: "showDataWithCurLocSegue", sender: nil)

@@ -68,7 +68,6 @@ class PopUpDatePickViewController: UIViewController {
             fetchSI.fetch(completion: { (resSunInfo) -> () in
                 if let res = resSunInfo {
                     self.modelController.sunInfo = res
-                    self.modelController.updateTime()
                     
                     self.performSegue(withIdentifier: "doneSettingDateSegue", sender: nil)
                 }
