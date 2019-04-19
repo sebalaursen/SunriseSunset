@@ -8,6 +8,13 @@
 
 import Foundation
 
-class SunInfo {
-    
+struct result: Decodable {
+    let results: SunInfo
+}
+
+struct SunInfo: Decodable {
+    var sunrise: String!
+    var sunset: String!
+    var solar_noon: String!
+    var day_length: String!
 }

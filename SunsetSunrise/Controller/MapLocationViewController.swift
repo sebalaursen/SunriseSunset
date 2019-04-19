@@ -13,9 +13,11 @@ import GooglePlaces
 class MapLocationViewController: UIViewController {
     
     @IBOutlet weak var googleMap: GMSMapView!
+    var modelController: ModelController!
     var marker: GMSMarker!
     var resultsViewController: GMSAutocompleteResultsViewController?
     var searchController: UISearchController?
+    
     var mapModeSelector: UISegmentedControl = {
         let mms = UISegmentedControl(items: ["Map", "Satalite"])
         mms.translatesAutoresizingMaskIntoConstraints = false
@@ -33,11 +35,15 @@ class MapLocationViewController: UIViewController {
         return btn
     }()
     
+    // MARK: - View controller lifecycle method
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupMapSubs()
         setupSearch()
     }
+    
+    // MARK: - View setups
     
     func setupMapSubs() {
         googleMap.delegate = self
@@ -63,6 +69,8 @@ class MapLocationViewController: UIViewController {
         searchController?.hidesNavigationBarDuringPresentation = false
     }
     
+    // MARK: - Actions
+    
     @objc func mapModeChange(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {
         case 0:
@@ -75,31 +83,40 @@ class MapLocationViewController: UIViewController {
     }
     
     @objc func doneChoosing() {
-        let popUp = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "PopUpDatePicker") as! PopUpDatePickViewController
-        self.addChild(popUp)
-        popUp.view.frame = self.view.frame
-        self.view.addSubview(popUp.view)
-        
+        if modelController.locationDate.coordinates.latitude != "" {
+            let popUp = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "PopUpDatePicker") as! PopUpDatePickViewController
+            self.addChild(popUp)
+            popUp.view.frame = self.view.frame
+            popUp.modelController = modelController
+            self.view.addSubview(popUp.view)
+        } else {
+            alertPopUp(title: "Pick location", message: "You can pick location by holding on a place on map or search.")
+        }
     }
     
 }
+
+
 
 extension MapLocationViewController: GMSAutocompleteResultsViewControllerDelegate {
     func resultsController(_ resultsController: GMSAutocompleteResultsViewController, didAutocompleteWith place: GMSPlace) {
         searchController?.isActive = false
         let position = CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
         let camera = GMSCameraPosition(target: position, zoom: 3)
+        
+        modelController.locationDate.adress = place.formattedAddress!
+        modelController.locationDate.coordinates.latitude = "\(position.latitude)"
+        modelController.locationDate.coordinates.longitude = "\(position.longitude)"
+        
         googleMap.clear()
         marker = GMSMarker(position: position)
-        marker.title = place.name
+        marker.title = place.formattedAddress
         marker.map = googleMap
         googleMap.camera = camera
-        //navigationItem.titleView = nil
     }
     
     func resultsController(_ resultsController: GMSAutocompleteResultsViewController,
                            didFailAutocompleteWithError error: Error){
-        // TODO: handle the error.
         print("Error: ", error.localizedDescription)
     }
     
@@ -114,15 +131,25 @@ extension MapLocationViewController: GMSAutocompleteResultsViewControllerDelegat
 
 extension MapLocationViewController: GMSMapViewDelegate {
     func mapView(_ mapView: GMSMapView, didLongPressAt coordinate: CLLocationCoordinate2D) {
-        let geocoder = GMSGeocoder()
+        
+        let geoCoder = GMSGeocoder()
         googleMap.clear()
+        print(coordinate.latitude)
+        print(coordinate.longitude)
+        modelController.locationDate.coordinates.latitude = "\(coordinate.latitude)"
+        modelController.locationDate.coordinates.longitude = "\(coordinate.longitude)"
+        print(modelController.locationDate.coordinates.latitude)
+        print(modelController.locationDate.coordinates.longitude)
         marker = GMSMarker(position: coordinate)
-        geocoder.reverseGeocodeCoordinate(coordinate) { response, error in
+        geoCoder.reverseGeocodeCoordinate(coordinate) { response, error in
             guard let address = response?.firstResult(), let adress = address.lines else {
                 return
             }
             self.marker.title = adress.joined(separator: "\n")
+            self.modelController.locationDate.adress = adress.joined(separator: "\n")
         }
+        print(modelController.locationDate.coordinates.latitude)
+        print(modelController.locationDate.coordinates.longitude)
         marker.map = mapView
     }
 }

@@ -1,5 +1,5 @@
 //
-//  Location.swift
+//  fetchSunInfo.swift
 //  SunsetSunrise
 //
 //  Created by Sebastian on /18/4/19.
@@ -8,6 +8,4 @@
 
 import Foundation
 
-class Location {
-    
-}
+class

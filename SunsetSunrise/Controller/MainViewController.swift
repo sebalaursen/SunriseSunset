@@ -16,20 +16,32 @@ class MainViewController: UIViewController {
     @IBOutlet weak var currentBtn: UIButton!
     @IBOutlet weak var chooseBtn: UIButton!
     let locationManager = CLLocationManager()
+    var modelController: ModelController!
+    var locManager = CoreLocationManadger()
+    var currentLocation = CLLocationCoordinate2D()
+    
+    // MARK: - View controller lifecycle methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        locManager.delegate = self
+        locManager.startTracking()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         animateSun()
+        modelController = ModelController()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(onFindingPlace(notif:)), name: Notification.Name("foundLocation"), object: nil)
     }
+    
+    // MARK: - Animation
     
     private func animateSun() {
         if sunImage != nil {
             sunImage.image = sunImage.image?.withRenderingMode(.alwaysTemplate)
             let midlePoint = CGPoint(x: self.nameLabel.frame.midX - self.sunImage.frame.width/2,
-                                     y: self.sunImage.frame.origin.y - self.nameLabel.frame.width/2)
+                                     y: self.sunImage.frame.origin.y - self.nameLabel.frame.width/1.9)
             let endPoint = CGPoint(x: self.sunImage.frame.maxX + self.nameLabel.frame.width + 11.5,
                                    y: self.sunImage.frame.origin.y)
             
@@ -56,6 +68,28 @@ class MainViewController: UIViewController {
             }
         }
     }
+    
+    // MARK: - Location acces alert
+    
+    func alertLocationAccess() {
+        let settingsAppURL = URL(string: UIApplication.openSettingsURLString)!
+        
+        let alert = UIAlertController(
+            title: "Need location tracking access",
+            message: "Is needed to use this app",
+            preferredStyle: UIAlertController.Style.alert
+        )
+        alert.view.tintColor = .gray
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Allow", style: .default, handler: { (alert) -> Void in
+            UIApplication.shared.open(settingsAppURL, options: [:], completionHandler: nil)
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    // MARK: - Button actions, segue prepare
 
     @IBAction func currentLocDateBtnAction(_ sender: Any) {
         switch CLLocationManager.authorizationStatus() {
@@ -66,31 +100,71 @@ class MainViewController: UIViewController {
         case .denied:
             alertLocationAccess()
         case .authorizedAlways:
-            performSegue(withIdentifier: "currentSegue", sender: nil)
+            locManager.startTracking()
+            processLocationInfo()
         case .authorizedWhenInUse:
-            performSegue(withIdentifier: "currentSegue", sender: nil)
+            locManager.startTracking()
+            processLocationInfo()
         }
     }
     
-    @IBAction func chooseLocDateBtnAction(_ sender: Any) {
-        performSegue(withIdentifier: "chooseSegue", sender: nil)
+    @IBAction func chooseLocBtnAction(_ sender: Any) {
+        locManager.stopTracking()
+        performSegue(withIdentifier: "chooseLocSegue", sender: nil)
     }
     
-    func alertLocationAccess() {
-        let settingsAppURL = URL(string: UIApplication.openSettingsURLString)!
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let chooseDataDisplayViewController = segue.destination as? SetupDataViewController {
+            chooseDataDisplayViewController.modelController = modelController
+        }
+        if let dataDisplayViewController = segue.destination as? DataDisplayViewController { 
+            dataDisplayViewController.modelController = modelController
+        }
+    }
+    
+    @objc func onFindingPlace(notif: Notification) {
+        let coord: CLLocationCoordinate2D = notif.userInfo![1] as! CLLocationCoordinate2D
+        modelController.locationDate.adress = notif.userInfo![0] as! String
+        modelController.locationDate.coordinates.latitude = "\(coord.latitude)"
+        modelController.locationDate.coordinates.longitude = "\(coord.longitude)"
         
-        let alert = UIAlertController(
-            title: "Need location tracking access",
-            message: "Is needed to use this app",
-            preferredStyle: UIAlertController.Style.alert
-        )
+        fetchSunInfo()
+    }
+    
+    func processLocationInfo() {
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: "Allow", style: .default, handler: { (alert) -> Void in
-            UIApplication.shared.open(settingsAppURL, options: [:], completionHandler: nil)
-        }))
+        modelController.locationDate.adress = "Your location"
+        modelController.locationDate.coordinates.latitude = "\(currentLocation.latitude)"
+        modelController.locationDate.coordinates.longitude = "\(currentLocation.longitude)"
+
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        print(formatter.string(from: date))
+        modelController.locationDate.date = formatter.string(from: date)
         
-        self.present(alert, animated: true, completion: nil)
+        fetchSunInfo()
+    }
+    func fetchSunInfo() {
+        let fetchSI = FetchSunInfo(url: RequestURL(latitude: Float(modelController.locationDate.coordinates.latitude)! , longitute: Float(modelController.locationDate.coordinates.latitude)! , date: modelController.locationDate.date))
+        fetchSI.fetch(completion: { (resSunInfo) -> () in
+            if let res = resSunInfo {
+                self.modelController.sunInfo = res
+                self.modelController.updateTime()
+                self.locManager.stopTracking()
+                
+                self.performSegue(withIdentifier: "showDataWithCurLocSegue", sender: nil)
+            }
+        })
+    }
+
+}
+
+extension MainViewController: CoreLocDelegate {
+    func getCoordinates(location: CLLocation) {
+        print("lat: \(location.coordinate.latitude); lon: \(location.coordinate.longitude)")
+        currentLocation.latitude = location.coordinate.latitude
+        currentLocation.longitude = location.coordinate.longitude
     }
 }
 

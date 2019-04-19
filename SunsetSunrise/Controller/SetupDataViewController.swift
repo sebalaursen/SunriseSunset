@@ -12,7 +12,12 @@ import GooglePlaces
 class SetupDataViewController: UIViewController {
     @IBOutlet weak var locationTextField: UITextField!
     @IBOutlet weak var dateTextField: UITextField!
+    var modelController: ModelController!
+    var place: GMSPlace?
+
     let datePicker = UIDatePicker()
+    
+    // MARK: - View controller lifecycle methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,11 +25,21 @@ class SetupDataViewController: UIViewController {
         setUpToolbar()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        locationTextField.text = modelController.locationDate.adress
+        dateTextField.text = modelController.locationDate.date
+        modelController.locationDate.timeDifference = 0
+    }
+    
+    // MARK: - View setups
+    
     func setupDatePicker() {
         datePicker.backgroundColor = .lightGray
         datePicker.datePickerMode = .date
         dateTextField.inputView = datePicker
     }
+    
     
     func setUpToolbar() {
         let toolBar = UIToolbar()
@@ -39,50 +54,86 @@ class SetupDataViewController: UIViewController {
         dateTextField.inputAccessoryView = toolBar
     }
     
+    // MARK: - Actions, segue prepare
+    
     @objc func dismissPicker() {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
-        dateTextField.text = formatter.string(from: datePicker.date)
+        formatter.dateFormat = "dd.MM.yyyy"
+        modelController.locationDate.date = formatter.string(from: datePicker.date)
+        dateTextField.text = modelController.locationDate.date
+        modelController.getTimeZone()
         view.endEditing(true)
+    }
+    
+    @IBAction func mapBtnAction(_ sender: Any) {
+        performSegue(withIdentifier: "toMapSegue", sender: nil)
+    }
+    
+    @IBAction func doneAction(_ sender: Any) {
+        if self.locationTextField.text != "" && self.dateTextField.text != "" {
+            let fetchSI = FetchSunInfo(url: RequestURL(latitude: Float(modelController.locationDate.coordinates.latitude)! , longitute: Float(modelController.locationDate.coordinates.latitude)! , date: modelController.locationDate.date))
+            fetchSI.fetch(completion: { (resSunInfo) -> () in
+                if let res = resSunInfo {
+                    self.modelController.sunInfo = res
+                    self.modelController.updateTime()
+                    
+                    self.performSegue(withIdentifier: "doneSettingSegue", sender: nil)
+                }
+            })
+        } else {
+            alertPopUp(title: "Pick location and date", message: "Don't leave empty fields!")
+        }
+        
     }
     
     @IBAction func searchLocationAction(_ sender: Any) {
         let autocompleteController = GMSAutocompleteViewController()
         autocompleteController.delegate = self
-        
-        let fields: GMSPlaceField = GMSPlaceField(rawValue: UInt(GMSPlaceField.name.rawValue) |
-            UInt(GMSPlaceField.placeID.rawValue))!
+
+        let fields: GMSPlaceField = GMSPlaceField(rawValue: UInt(GMSPlaceField.formattedAddress.rawValue) |
+            UInt(GMSPlaceField.coordinate.rawValue))!
         autocompleteController.placeFields = fields
-        
+
         let filter = GMSAutocompleteFilter()
-        filter.type = .geocode
+        filter.type = .city
         autocompleteController.autocompleteFilter = filter
         present(autocompleteController, animated: true, completion: nil)
     }
-    @IBAction func mapBtnAction(_ sender: Any) {
-        performSegue(withIdentifier: "mapSegue", sender: nil)
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let dataDisplayViewController = segue.destination as? DataDisplayViewController {
+            dataDisplayViewController.modelController = modelController
+        }
+        if let mapViewController = segue.destination as? MapLocationViewController {
+            mapViewController.modelController = modelController
+        }
     }
 }
 
+
+
 extension SetupDataViewController: GMSAutocompleteViewControllerDelegate {
     func viewController(_ viewController: GMSAutocompleteViewController, didAutocompleteWith place: GMSPlace) {
-        locationTextField.text = "\(place.name ?? ""), \(place.placeID ?? "")"
+        modelController.locationDate.adress = place.formattedAddress!
+        modelController.locationDate.coordinates.latitude = "\(place.coordinate.latitude)"
+        modelController.locationDate.coordinates.longitude = "\(place.coordinate.longitude)"
+        print(modelController.locationDate.coordinates.latitude)
+        print(modelController.locationDate.coordinates.longitude)
         dismiss(animated: true, completion: nil)
     }
-    
+
     func viewController(_ viewController: GMSAutocompleteViewController, didFailAutocompleteWithError error: Error) {
-        // TODO: handle the error.
         print("Error: ", error.localizedDescription)
     }
-    
+
     func wasCancelled(_ viewController: GMSAutocompleteViewController) {
         dismiss(animated: true, completion: nil)
     }
-    
+
     func didRequestAutocompletePredictions(_ viewController: GMSAutocompleteViewController) {
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
     }
-    
+
     func didUpdateAutocompletePredictions(_ viewController: GMSAutocompleteViewController) {
         UIApplication.shared.isNetworkActivityIndicatorVisible = false
     }

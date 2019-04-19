@@ -18,8 +18,13 @@
 		9E2CA7C222677E1C00AA2093 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 9E2CA7C122677E1C00AA2093 /* Podfile */; };
 		9E2CA7C422678AF900AA2093 /* SetupDataViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2CA7C322678AF900AA2093 /* SetupDataViewController.swift */; };
 		9E2CA7C62267DA4B00AA2093 /* PopUpDatePickViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2CA7C52267DA4B00AA2093 /* PopUpDatePickViewController.swift */; };
-		9E2CA7C82267EA1E00AA2093 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2CA7C72267EA1E00AA2093 /* Location.swift */; };
+		9E2CA7C82267EA1E00AA2093 /* LocationDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2CA7C72267EA1E00AA2093 /* LocationDate.swift */; };
 		9E2CA7CA2267EA3F00AA2093 /* SunInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2CA7C92267EA3F00AA2093 /* SunInfo.swift */; };
+		9E2CA7CE22688FFF00AA2093 /* ModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2CA7CD22688FFF00AA2093 /* ModelController.swift */; };
+		9E2CA7D02268C0FB00AA2093 /* RequestURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2CA7CF2268C0FB00AA2093 /* RequestURL.swift */; };
+		9E2CA7D52268E55C00AA2093 /* FetchSunInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2CA7D42268E55C00AA2093 /* FetchSunInfo.swift */; };
+		9E2CA7DF2269935300AA2093 /* ViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2CA7DE2269935300AA2093 /* ViewControllerExtension.swift */; };
+		9E2CA7E12269A86D00AA2093 /* CoreLocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E2CA7E02269A86D00AA2093 /* CoreLocationManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,11 +39,16 @@
 		9E2CA7B22267356900AA2093 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9E2CA7BB226755E800AA2093 /* MapLocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapLocationViewController.swift; sourceTree = "<group>"; };
 		9E2CA7BD2267562400AA2093 /* DataDisplayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataDisplayViewController.swift; sourceTree = "<group>"; };
-		9E2CA7C122677E1C00AA2093 /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; };
+		9E2CA7C122677E1C00AA2093 /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9E2CA7C322678AF900AA2093 /* SetupDataViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupDataViewController.swift; sourceTree = "<group>"; };
 		9E2CA7C52267DA4B00AA2093 /* PopUpDatePickViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpDatePickViewController.swift; sourceTree = "<group>"; };
-		9E2CA7C72267EA1E00AA2093 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		9E2CA7C72267EA1E00AA2093 /* LocationDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDate.swift; sourceTree = "<group>"; };
 		9E2CA7C92267EA3F00AA2093 /* SunInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunInfo.swift; sourceTree = "<group>"; };
+		9E2CA7CD22688FFF00AA2093 /* ModelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelController.swift; sourceTree = "<group>"; };
+		9E2CA7CF2268C0FB00AA2093 /* RequestURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestURL.swift; sourceTree = "<group>"; };
+		9E2CA7D42268E55C00AA2093 /* FetchSunInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchSunInfo.swift; sourceTree = "<group>"; };
+		9E2CA7DE2269935300AA2093 /* ViewControllerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerExtension.swift; sourceTree = "<group>"; };
+		9E2CA7E02269A86D00AA2093 /* CoreLocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreLocationManager.swift; sourceTree = "<group>"; };
 		BC53A3888EDA0E28AA2461BE /* Pods-SunsetSunrise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SunsetSunrise.debug.xcconfig"; path = "Target Support Files/Pods-SunsetSunrise/Pods-SunsetSunrise.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,10 +94,13 @@
 		9E2CA7A52267356600AA2093 /* SunsetSunrise */ = {
 			isa = PBXGroup;
 			children = (
+				9E2CA7CC22688FEC00AA2093 /* ModelController */,
+				9E2CA7CB22686FF200AA2093 /* Networking */,
 				9E2CA7B82267554F00AA2093 /* Model */,
-				9E2CA7B92267555D00AA2093 /* View */,
+				9E2CA7B92267555D00AA2093 /* Extensions */,
 				9E2CA7BA2267557700AA2093 /* Controller */,
 				9E2CA7A62267356600AA2093 /* AppDelegate.swift */,
+				9E2CA7AA2267356600AA2093 /* Main.storyboard */,
 				9E2CA7AD2267356900AA2093 /* Assets.xcassets */,
 				9E2CA7AF2267356900AA2093 /* LaunchScreen.storyboard */,
 				9E2CA7B22267356900AA2093 /* Info.plist */,
@@ -98,18 +111,19 @@
 		9E2CA7B82267554F00AA2093 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				9E2CA7C72267EA1E00AA2093 /* Location.swift */,
+				9E2CA7C72267EA1E00AA2093 /* LocationDate.swift */,
 				9E2CA7C92267EA3F00AA2093 /* SunInfo.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
 		};
-		9E2CA7B92267555D00AA2093 /* View */ = {
+		9E2CA7B92267555D00AA2093 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				9E2CA7AA2267356600AA2093 /* Main.storyboard */,
+				9E2CA7DE2269935300AA2093 /* ViewControllerExtension.swift */,
+				9E2CA7E02269A86D00AA2093 /* CoreLocationManager.swift */,
 			);
-			path = View;
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		9E2CA7BA2267557700AA2093 /* Controller */ = {
@@ -122,6 +136,23 @@
 				9E2CA7C52267DA4B00AA2093 /* PopUpDatePickViewController.swift */,
 			);
 			path = Controller;
+			sourceTree = "<group>";
+		};
+		9E2CA7CB22686FF200AA2093 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				9E2CA7CF2268C0FB00AA2093 /* RequestURL.swift */,
+				9E2CA7D42268E55C00AA2093 /* FetchSunInfo.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		9E2CA7CC22688FEC00AA2093 /* ModelController */ = {
+			isa = PBXGroup;
+			children = (
+				9E2CA7CD22688FFF00AA2093 /* ModelController.swift */,
+			);
+			path = ModelController;
 			sourceTree = "<group>";
 		};
 		EFB163C16B328893D8BA7F90 /* Pods */ = {
@@ -256,14 +287,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E2CA7DF2269935300AA2093 /* ViewControllerExtension.swift in Sources */,
+				9E2CA7D02268C0FB00AA2093 /* RequestURL.swift in Sources */,
+				9E2CA7E12269A86D00AA2093 /* CoreLocationManager.swift in Sources */,
 				9E2CA7A92267356600AA2093 /* MainViewController.swift in Sources */,
 				9E2CA7BE2267562400AA2093 /* DataDisplayViewController.swift in Sources */,
 				9E2CA7CA2267EA3F00AA2093 /* SunInfo.swift in Sources */,
+				9E2CA7CE22688FFF00AA2093 /* ModelController.swift in Sources */,
+				9E2CA7D52268E55C00AA2093 /* FetchSunInfo.swift in Sources */,
 				9E2CA7BC226755E800AA2093 /* MapLocationViewController.swift in Sources */,
 				9E2CA7A72267356600AA2093 /* AppDelegate.swift in Sources */,
 				9E2CA7C62267DA4B00AA2093 /* PopUpDatePickViewController.swift in Sources */,
 				9E2CA7C422678AF900AA2093 /* SetupDataViewController.swift in Sources */,
-				9E2CA7C82267EA1E00AA2093 /* Location.swift in Sources */,
+				9E2CA7C82267EA1E00AA2093 /* LocationDate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
