@@ -13,6 +13,9 @@ class PopUpDatePickViewController: UIViewController {
     @IBOutlet weak var dateTextField: UITextField!
     let datePicker = UIDatePicker()
     var modelController: ModelController!
+    var loadIndicator: UIActivityIndicatorView?
+    
+    // MARK: - View controller lifecycle methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,8 +26,9 @@ class PopUpDatePickViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         dateTextField.text = modelController.locationDate.date
-        modelController.locationDate.timeDifference = 0
     }
+    
+    // MARK: - View setups
     
     func setupPickerAndView() {
         self.view.backgroundColor = UIColor.lightGray.withAlphaComponent(0.7)
@@ -47,12 +51,32 @@ class PopUpDatePickViewController: UIViewController {
         dateTextField.inputAccessoryView = toolBar
     }
     
+    // MARK: - Loading Animation
+    
+    func startLoadAnimation() {
+        loadIndicator = UIActivityIndicatorView()
+        
+        loadIndicator!.center = view.center
+        loadIndicator!.hidesWhenStopped = true
+        loadIndicator!.style = .gray
+        view.addSubview(loadIndicator!)
+        loadIndicator!.startAnimating()
+        
+        UIApplication.shared.beginIgnoringInteractionEvents()
+    }
+    
+    func stopLoadAnimation() {
+        loadIndicator!.removeFromSuperview()
+        UIApplication.shared.endIgnoringInteractionEvents()
+    }
+    
+    // MARK: - Button actions, segue prepare
+    
     @objc func dismissPicker() {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
         modelController.locationDate.date = formatter.string(from: datePicker.date)
         dateTextField.text = modelController.locationDate.date
-        modelController.getTimeZone()
         view.endEditing(true)
     }
     
@@ -64,11 +88,12 @@ class PopUpDatePickViewController: UIViewController {
     
     @IBAction func doneAction(_ sender: Any) {
         if self.dateTextField.text != "" {
+            startLoadAnimation()
             let fetchSI = FetchSunInfo(url: RequestURL(latitude: Float(modelController.locationDate.coordinates.latitude)!, longitute: Float(modelController.locationDate.coordinates.longitude)!, date: modelController.locationDate.date))
             fetchSI.fetch(completion: { (resSunInfo) -> () in
                 if let res = resSunInfo {
-                    self.modelController.sunInfo = res
-                    
+                    self.modelController.setSunInfo(info: res)
+                    self.stopLoadAnimation()
                     self.performSegue(withIdentifier: "doneSettingDateSegue", sender: nil)
                 }
             })

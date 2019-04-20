@@ -19,20 +19,18 @@ class MainViewController: UIViewController {
     var modelController: ModelController!
     var locManager = CoreLocationManadger()
     var currentLocation = CLLocationCoordinate2D()
+    var loadIndicator: UIActivityIndicatorView?
     
     // MARK: - View controller lifecycle methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
         locManager.delegate = self
-        locManager.startTracking()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         animateSun()
         modelController = ModelController()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(onFindingPlace(notif:)), name: Notification.Name("foundLocation"), object: nil)
     }
     
     // MARK: - Animation
@@ -40,15 +38,15 @@ class MainViewController: UIViewController {
     private func animateSun() {
         if sunImage != nil {
             sunImage.image = sunImage.image?.withRenderingMode(.alwaysTemplate)
-            let midlePoint = CGPoint(x: self.nameLabel.frame.midX - self.sunImage.frame.width/2,
+            let middlePoint = CGPoint(x: self.nameLabel.frame.midX - self.sunImage.frame.width/2,
                                      y: self.sunImage.frame.origin.y - self.nameLabel.frame.width/1.9)
             let endPoint = CGPoint(x: self.sunImage.frame.maxX + self.nameLabel.frame.width + 11.5,
                                    y: self.sunImage.frame.origin.y)
             
             UIView.animateKeyframes(withDuration: 5, delay: 0, options: .calculationModeCubic, animations: {
                 UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.5, animations: {
-                    self.sunImage.frame.origin.x = midlePoint.x
-                    self.sunImage.frame.origin.y = midlePoint.y
+                    self.sunImage.frame.origin.x = middlePoint.x
+                    self.sunImage.frame.origin.y = middlePoint.y
                     self.sunImage.tintColor = UIColor(red: 253/255, green: 236/255, blue: 79/255, alpha: 1)
                     
                 })
@@ -89,8 +87,27 @@ class MainViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
+    // MARK: - Loading Animation
+    
+    func startLoadAnimation() {
+        loadIndicator = UIActivityIndicatorView()
+        
+        loadIndicator!.center = view.center
+        loadIndicator!.hidesWhenStopped = true
+        loadIndicator!.style = .gray
+        view.addSubview(loadIndicator!)
+        loadIndicator!.startAnimating()
+        
+        UIApplication.shared.beginIgnoringInteractionEvents()
+    }
+    
+    func stopLoadAnimation() {
+        loadIndicator!.removeFromSuperview()
+        UIApplication.shared.endIgnoringInteractionEvents()
+    }
+    
     // MARK: - Button actions, segue prepare
-
+    
     @IBAction func currentLocDateBtnAction(_ sender: Any) {
         switch CLLocationManager.authorizationStatus() {
         case .notDetermined:
@@ -100,9 +117,11 @@ class MainViewController: UIViewController {
         case .denied:
             alertLocationAccess()
         case .authorizedAlways:
+            startLoadAnimation()
             locManager.startTracking()
             processLocationInfo()
         case .authorizedWhenInUse:
+            startLoadAnimation()
             locManager.startTracking()
             processLocationInfo()
         }
@@ -121,38 +140,36 @@ class MainViewController: UIViewController {
             dataDisplayViewController.modelController = modelController
         }
     }
-    
-    @objc func onFindingPlace(notif: Notification) {
-        let coord: CLLocationCoordinate2D = notif.userInfo![1] as! CLLocationCoordinate2D
-        modelController.locationDate.adress = notif.userInfo![0] as! String
-        modelController.locationDate.coordinates.latitude = "\(coord.latitude)"
-        modelController.locationDate.coordinates.longitude = "\(coord.longitude)"
-        
-        fetchSunInfo()
-    }
+
+    // MARK: - Fetching info
     
     func processLocationInfo() {
-        
-        modelController.locationDate.adress = "Your location"
-        modelController.locationDate.coordinates.latitude = "\(currentLocation.latitude)"
-        modelController.locationDate.coordinates.longitude = "\(currentLocation.longitude)"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.modelController.locationDate.adress = "Your location"
+            self.modelController.locationDate.coordinates.latitude = "\(self.currentLocation.latitude)"
+            self.modelController.locationDate.coordinates.longitude = "\(self.currentLocation.longitude)"
+            print(self.modelController.locationDate.coordinates.latitude)
+            print(self.modelController.locationDate.coordinates.longitude)
 
-        let date = Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy"
-        print(formatter.string(from: date))
-        modelController.locationDate.date = formatter.string(from: date)
-        modelController.getTimeZone()
-        
-        fetchSunInfo()
+            let date = Date()
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd.MM.yyyy"
+            print(formatter.string(from: date))
+            self.modelController.locationDate.date = formatter.string(from: date)
+            self.modelController.getTimeZone(completion: {(complete) -> () in
+                if complete {
+                    self.fetchSunInfo()
+                }
+            })
+            self.locManager.stopTracking()
+        }
     }
     func fetchSunInfo() {
         let fetchSI = FetchSunInfo(url: RequestURL(latitude: Float(modelController.locationDate.coordinates.latitude)! , longitute: Float(modelController.locationDate.coordinates.longitude)! , date: modelController.locationDate.date))
         fetchSI.fetch(completion: { (resSunInfo) -> () in
             if let res = resSunInfo {
-                self.modelController.sunInfo = res
-                self.locManager.stopTracking()
-                
+                self.modelController.setSunInfo(info: res)
+                self.stopLoadAnimation()
                 self.performSegue(withIdentifier: "showDataWithCurLocSegue", sender: nil)
             }
         })

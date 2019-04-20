@@ -14,6 +14,7 @@ class SetupDataViewController: UIViewController {
     @IBOutlet weak var dateTextField: UITextField!
     var modelController: ModelController!
     var place: GMSPlace?
+    var loadIndicator: UIActivityIndicatorView?
 
     let datePicker = UIDatePicker()
     
@@ -29,7 +30,6 @@ class SetupDataViewController: UIViewController {
         super.viewWillAppear(animated)
         locationTextField.text = modelController.locationDate.adress
         dateTextField.text = modelController.locationDate.date
-        modelController.locationDate.timeDifference = 0
     }
     
     // MARK: - View setups
@@ -54,6 +54,23 @@ class SetupDataViewController: UIViewController {
         dateTextField.inputAccessoryView = toolBar
     }
     
+    func startLoadAnimation() {
+        loadIndicator = UIActivityIndicatorView()
+        
+        loadIndicator!.center = view.center
+        loadIndicator!.hidesWhenStopped = true
+        loadIndicator!.style = .gray
+        view.addSubview(loadIndicator!)
+        loadIndicator!.startAnimating()
+        
+        UIApplication.shared.beginIgnoringInteractionEvents()
+    }
+    
+    func stopLoadAnimation() {
+        loadIndicator!.removeFromSuperview()
+        UIApplication.shared.endIgnoringInteractionEvents()
+    }
+    
     // MARK: - Actions, segue prepare
     
     @objc func dismissPicker() {
@@ -70,13 +87,13 @@ class SetupDataViewController: UIViewController {
     
     @IBAction func doneAction(_ sender: Any) {
         if self.locationTextField.text != "" && self.dateTextField.text != "" {
-            modelController.getTimeZone()
+            startLoadAnimation()
             let fetchSI = FetchSunInfo(url: RequestURL(latitude: Float(modelController.locationDate.coordinates.latitude)! , longitute: Float(modelController.locationDate.coordinates.longitude)! , date: modelController.locationDate.date))
             print(modelController.locationDate.date)
             fetchSI.fetch(completion: { (resSunInfo) -> () in
                 if let res = resSunInfo {
-                    self.modelController.sunInfo = res
-                    
+                    self.modelController.setSunInfo(info: res)
+                    self.stopLoadAnimation()
                     self.performSegue(withIdentifier: "doneSettingSegue", sender: nil)
                 }
             })
@@ -117,6 +134,7 @@ extension SetupDataViewController: GMSAutocompleteViewControllerDelegate {
         modelController.locationDate.adress = place.formattedAddress!
         modelController.locationDate.coordinates.latitude = "\(place.coordinate.latitude)"
         modelController.locationDate.coordinates.longitude = "\(place.coordinate.longitude)"
+        modelController.getTimeZone()
         dismiss(animated: true, completion: nil)
     }
 

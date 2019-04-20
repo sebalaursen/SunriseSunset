@@ -13,16 +13,14 @@ class ModelController {
     var locationDate = LocationDate(adress: "", coordinates: Coordinates(latitude: "", longitude: ""), date: "", timeDifference: 0)
     var sunInfo = SunInfo(sunrise: "", sunset: "", solar_noon: "", day_length: "")
     
-    func updateTime() {
-        print(sunInfo.sunset)
-        print(sunInfo.sunrise)
-        print(sunInfo.solar_noon)
-        sunInfo.sunset = format(time: sunInfo.sunset)
-        sunInfo.sunrise = format(time: sunInfo.sunrise)
-        sunInfo.solar_noon = format(time: sunInfo.solar_noon)
+    func setSunInfo(info: SunInfo) {
+        sunInfo.sunrise = format(time: info.sunrise)
+        sunInfo.sunset = format(time: info.sunset)
+        sunInfo.solar_noon = format(time: info.solar_noon)
+        sunInfo.day_length = info.day_length
     }
     
-    private func format(time: String) -> String {
+    private func format(time: String) ->String {
         var res = ""
         let dateString = "20-04-2019 \(time)"
         let dateFormatter = DateFormatter()
@@ -39,7 +37,20 @@ class ModelController {
         let index = res.firstIndex(of: " ")!
         res = String(res[index...])
         return res
-        
+    }
+    
+    func getTimeZone(completion: @escaping (_ completed: Bool ) -> () ) {
+        let latitude = Double(locationDate.coordinates.latitude)!
+        let longitude = Double(locationDate.coordinates.longitude)!
+        let geoCoder = CLGeocoder()
+        let location = CLLocation(latitude: latitude, longitude: longitude)
+        geoCoder.reverseGeocodeLocation(location) { (placemarks, err) in
+            guard let placemark = placemarks?[0], let _ = placemarks?[0].timeZone else {
+                return
+            }
+            self.locationDate.timeDifference = placemark.timeZone!.secondsFromGMT()
+            return completion(true)
+        }
     }
     
     func getTimeZone() {

@@ -20,6 +20,7 @@ class DataDisplayViewController: UIViewController {
     @IBOutlet weak var dayLengthLabel: UILabel!
     var datePicker = UIDatePicker()
     var picker: UIView!
+    var loadIndicator: UIActivityIndicatorView?
     
     
     // MARK: - View controller lifecycle methods
@@ -27,7 +28,6 @@ class DataDisplayViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupDatePicker()
-        modelController.updateTime()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -55,13 +55,32 @@ class DataDisplayViewController: UIViewController {
         picker.addSubview(toolBar)
     }
     
+    func startLoadAnimation() {
+        loadIndicator = UIActivityIndicatorView()
+        
+        loadIndicator!.center = view.center
+        loadIndicator!.hidesWhenStopped = true
+        loadIndicator!.style = .gray
+        view.addSubview(loadIndicator!)
+        loadIndicator!.startAnimating()
+        
+        UIApplication.shared.beginIgnoringInteractionEvents()
+    }
+    
+    func stopLoadAnimation() {
+        loadIndicator!.removeFromSuperview()
+        UIApplication.shared.endIgnoringInteractionEvents()
+    }
+    
     @objc func dismissPicker() {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
-        modelController.locationDate.date = formatter.string(from: datePicker.date)
-        dateLabel.text = modelController.locationDate.date
-        fetchDataNewTime()
-        
+        if modelController.locationDate.date != formatter.string(from: datePicker.date) {
+            startLoadAnimation()
+            modelController.locationDate.date = formatter.string(from: datePicker.date)
+            dateLabel.text = modelController.locationDate.date
+            fetchDataNewTime()
+        }
         picker.removeFromSuperview()
     }
     
@@ -69,13 +88,12 @@ class DataDisplayViewController: UIViewController {
         let fetchSI = FetchSunInfo(url: RequestURL(latitude: Float(modelController.locationDate.coordinates.latitude)! , longitute: Float(modelController.locationDate.coordinates.longitude)! , date: modelController.locationDate.date))
         fetchSI.fetch(completion: { (resSunInfo) -> () in
             if let res = resSunInfo {
-                self.modelController.sunInfo = res
-                self.modelController.updateTime()
+                self.modelController.setSunInfo(info: res)
+                self.stopLoadAnimation()
                 self.setup()
             }
         })
     }
-    
     
     // MARK: - Labels setup
     

@@ -29,8 +29,10 @@ class MapLocationViewController: UIViewController {
     var doneBtn: UIButton = {
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.backgroundColor = UIColor(red: 239/255, green: 239/255, blue: 244/255, alpha: 1)
+        btn.layer.cornerRadius = 15
         btn.tintColor = .black
-        btn.setTitle("Done", for: .normal)
+        btn.setTitle(" Done ", for: .normal)
         btn.addTarget(self, action: #selector(doneChoosing), for: .touchUpInside)
         return btn
     }()
@@ -107,6 +109,8 @@ extension MapLocationViewController: GMSAutocompleteResultsViewControllerDelegat
         modelController.locationDate.adress = place.formattedAddress!
         modelController.locationDate.coordinates.latitude = "\(position.latitude)"
         modelController.locationDate.coordinates.longitude = "\(position.longitude)"
+        modelController.getTimeZone()
+        
         
         googleMap.clear()
         marker = GMSMarker(position: position)
@@ -138,6 +142,7 @@ extension MapLocationViewController: GMSMapViewDelegate {
         print(coordinate.longitude)
         modelController.locationDate.coordinates.latitude = "\(coordinate.latitude)"
         modelController.locationDate.coordinates.longitude = "\(coordinate.longitude)"
+        modelController.getTimeZone()
         print(modelController.locationDate.coordinates.latitude)
         print(modelController.locationDate.coordinates.longitude)
         marker = GMSMarker(position: coordinate)
