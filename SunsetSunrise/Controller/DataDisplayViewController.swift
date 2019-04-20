@@ -12,7 +12,7 @@ class DataDisplayViewController: UIViewController {
     
     var modelController: ModelController!
 
-    @IBOutlet weak var locationLabel: UILabel!
+    @IBOutlet weak var locationTV: UITextView!
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var sunriseLabel: UILabel!
     @IBOutlet weak var sunsetLabel: UILabel!
@@ -98,7 +98,7 @@ class DataDisplayViewController: UIViewController {
     // MARK: - Labels setup
     
     func setup() {
-        locationLabel.text = modelController.locationDate.adress
+        locationTV.text = modelController.locationDate.adress
         dateLabel.text = modelController.locationDate.date
         sunriseLabel.text = modelController.sunInfo.sunrise
         sunsetLabel.text = modelController.sunInfo.sunset

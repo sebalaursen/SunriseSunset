@@ -44,6 +44,7 @@ class PopUpDatePickViewController: UIViewController {
         toolBar.backgroundColor = UIColor.darkGray
         
         let doneBtn = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(dismissPicker))
+        doneBtn.tintColor = .gray
         
         toolBar.setItems([doneBtn], animated: false)
         toolBar.isUserInteractionEnabled = true

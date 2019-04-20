@@ -32,7 +32,7 @@ class MapLocationViewController: UIViewController {
         btn.backgroundColor = UIColor(red: 239/255, green: 239/255, blue: 244/255, alpha: 1)
         btn.layer.cornerRadius = 15
         btn.tintColor = .black
-        btn.setTitle(" Done ", for: .normal)
+        btn.setTitle("  Done  ", for: .normal)
         btn.addTarget(self, action: #selector(doneChoosing), for: .touchUpInside)
         return btn
     }()
@@ -57,6 +57,18 @@ class MapLocationViewController: UIViewController {
         
         doneBtn.leftAnchor.constraint(equalTo: mapModeSelector.rightAnchor, constant: 50).isActive = true
         doneBtn.centerYAnchor.constraint(equalTo: mapModeSelector.centerYAnchor).isActive = true
+        
+        if modelController.locationDate.coordinates.latitude != "" {
+            let lat = Double(modelController.locationDate.coordinates.latitude)
+            let lon = Double(modelController.locationDate.coordinates.longitude)
+            let pos = CLLocationCoordinate2D(latitude: CLLocationDegrees(lat!), longitude: CLLocationDegrees(lon!))
+            marker = GMSMarker(position: pos)
+            marker.title = modelController.locationDate.adress
+            marker.map = googleMap
+            
+            let camera = GMSCameraPosition(target: pos, zoom: 3.5)
+            googleMap.camera = camera
+        }
     }
     
     func setupSearch() {
@@ -65,6 +77,7 @@ class MapLocationViewController: UIViewController {
         
         searchController = UISearchController(searchResultsController: resultsViewController)
         searchController?.searchResultsUpdater = resultsViewController
+        searchController?.view.tintColor = .gray
         
         navigationItem.titleView = searchController?.searchBar
         definesPresentationContext = true
@@ -104,7 +117,7 @@ extension MapLocationViewController: GMSAutocompleteResultsViewControllerDelegat
     func resultsController(_ resultsController: GMSAutocompleteResultsViewController, didAutocompleteWith place: GMSPlace) {
         searchController?.isActive = false
         let position = CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
-        let camera = GMSCameraPosition(target: position, zoom: 3)
+        let camera = GMSCameraPosition(target: position, zoom: 3.5)
         
         modelController.locationDate.adress = place.formattedAddress!
         modelController.locationDate.coordinates.latitude = "\(position.latitude)"

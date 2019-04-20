@@ -17,8 +17,7 @@ extension UIViewController {
             preferredStyle: UIAlertController.Style.alert
         )
         alert.view.tintColor = .gray
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
         
         self.present(alert, animated: true, completion: nil)

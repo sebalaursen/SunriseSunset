@@ -47,6 +47,7 @@ class SetupDataViewController: UIViewController {
         toolBar.backgroundColor = UIColor.darkGray
         
         let doneBtn = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(dismissPicker))
+        doneBtn.tintColor = .gray
         
         toolBar.setItems([doneBtn], animated: false)
         toolBar.isUserInteractionEnabled = true
@@ -106,6 +107,7 @@ class SetupDataViewController: UIViewController {
     @IBAction func searchLocationAction(_ sender: Any) {
         let autocompleteController = GMSAutocompleteViewController()
         autocompleteController.delegate = self
+        autocompleteController.view.tintColor = .gray
 
         let fields: GMSPlaceField = GMSPlaceField(rawValue: UInt(GMSPlaceField.formattedAddress.rawValue) |
             UInt(GMSPlaceField.coordinate.rawValue))!
@@ -134,8 +136,11 @@ extension SetupDataViewController: GMSAutocompleteViewControllerDelegate {
         modelController.locationDate.adress = place.formattedAddress!
         modelController.locationDate.coordinates.latitude = "\(place.coordinate.latitude)"
         modelController.locationDate.coordinates.longitude = "\(place.coordinate.longitude)"
-        modelController.getTimeZone()
-        dismiss(animated: true, completion: nil)
+        self.modelController.getTimeZone(completion: {(complete) -> () in
+            if complete {
+                self.dismiss(animated: true, completion: nil)
+            }
+        })
     }
 
     func viewController(_ viewController: GMSAutocompleteViewController, didFailAutocompleteWithError error: Error) {
